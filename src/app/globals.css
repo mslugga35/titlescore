@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0f;
-  --foreground: #f5f5f7;
+  --background: #06060d;
+  --foreground: #f0f0f8;
+  --surface: #0e0e1a;
+  --surface-raised: #13131f;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-bright: rgba(255, 255, 255, 0.12);
+  --accent-blue: #4f8ef7;
+  --accent-indigo: #7c6ff7;
+  --accent-violet: #a855f7;
+  --text-muted: rgba(200, 200, 220, 0.45);
+  --text-dim: rgba(200, 200, 220, 0.25);
 }
 
 @theme inline {
@@ -12,48 +21,363 @@
   --font-mono: var(--font-jetbrains);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
 }
 
-/* Animated gradient orb behind hero */
+/* ─── Noise texture ─── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Hero ─── */
 .hero-glow {
   position: absolute;
-  top: -120px;
+  top: -160px;
   left: 50%;
   transform: translateX(-50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 40%, transparent 70%);
-  filter: blur(60px);
+  width: 700px;
+  height: 500px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(79, 142, 247, 0.13) 0%,
+    rgba(124, 111, 247, 0.07) 45%,
+    transparent 70%
+  );
+  filter: blur(80px);
   pointer-events: none;
-  animation: pulse-glow 4s ease-in-out infinite alternate;
+  animation: pulse-glow 5s ease-in-out infinite alternate;
 }
 
 @keyframes pulse-glow {
-  0% { opacity: 0.6; transform: translateX(-50%) scale(1); }
-  100% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+  0%   { opacity: 0.5; transform: translateX(-50%) scale(1); }
+  100% { opacity: 1;   transform: translateX(-50%) scale(1.12); }
 }
 
-/* Fade-in animation for page load */
+/* ─── Fade-up entrance ─── */
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-up {
-  animation: fade-up 0.6s ease-out forwards;
+  animation: fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-fade-up-delay-1 {
-  animation: fade-up 0.6s ease-out 0.1s forwards;
+  animation: fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
   opacity: 0;
 }
 
 .animate-fade-up-delay-2 {
-  animation: fade-up 0.6s ease-out 0.2s forwards;
+  animation: fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.22s forwards;
   opacity: 0;
 }
 
+.animate-fade-up-delay-3 {
+  animation: fade-up 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.34s forwards;
+  opacity: 0;
+}
+
+/* ─── Score reveal ─── */
+@keyframes score-reveal {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-score-reveal {
+  animation: score-reveal 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ─── Score bar fill ─── */
+@keyframes bar-fill {
+  from { width: 0; }
+}
+
+.score-bar-fill {
+  animation: bar-fill 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.score-bar-fill-delay-1 { animation-delay: 0.08s; }
+.score-bar-fill-delay-2 { animation-delay: 0.16s; }
+.score-bar-fill-delay-3 { animation-delay: 0.24s; }
+.score-bar-fill-delay-4 { animation-delay: 0.32s; }
+.score-bar-fill-delay-5 { animation-delay: 0.40s; }
+
+/* ─── Input card surface ─── */
+.input-card {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(14, 14, 26, 0.8) 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+  transition: border-color 0.2s;
+}
+
+.input-card:focus-within {
+  border-color: var(--border-bright);
+}
+
+/* ─── Styled inputs ─── */
+.ts-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.925rem;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.ts-input::placeholder {
+  color: var(--text-muted);
+}
+
+.ts-input:focus {
+  border-color: rgba(79, 142, 247, 0.5);
+  background: rgba(79, 142, 247, 0.04);
+  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.08);
+}
+
+/* ─── Primary gradient button ─── */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3b82f6, #7c3aed);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  border-radius: 13px;
+  font-weight: 600;
+  transition: filter 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.12);
+  box-shadow: 0 4px 24px rgba(79, 142, 247, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  background: rgba(255,255,255,0.06);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+/* Shimmer on hover */
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 50%, transparent 60%);
+  transform: translateX(-100%);
+  transition: transform 0.4s;
+}
+
+.btn-primary:hover:not(:disabled)::after {
+  transform: translateX(100%);
+}
+
+/* ─── Secondary button ─── */
+.btn-secondary {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  font-weight: 500;
+  transition: background 0.2s, transform 0.15s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--border-bright);
+  transform: translateY(-1px);
+}
+
+/* ─── Thumbnail drop zone ─── */
+.thumb-dropzone {
+  border: 1.5px dashed rgba(255,255,255,0.1);
+  border-radius: 14px;
+  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+}
+
+.thumb-dropzone:hover {
+  border-color: rgba(79, 142, 247, 0.4);
+  background: rgba(79, 142, 247, 0.04);
+}
+
+/* ─── Result cards ─── */
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.result-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-1px);
+}
+
+/* ─── Grade badge ─── */
+@keyframes grade-pop {
+  0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  60%  { transform: scale(1.08) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.grade-badge {
+  animation: grade-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+}
+
+/* ─── Improved title rows ─── */
+.title-row {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  transition: background 0.18s, border-color 0.18s, transform 0.18s;
+}
+
+.title-row:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: var(--border);
+  transform: translateX(2px);
+}
+
+/* ─── Waitlist section ─── */
+.waitlist-section {
+  position: relative;
+  background: linear-gradient(160deg, #0c0c1e 0%, #0e0820 50%, #070712 100%);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.waitlist-section::before {
+  content: "";
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 500px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(124, 111, 247, 0.1) 0%,
+    rgba(79, 142, 247, 0.05) 40%,
+    transparent 70%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.waitlist-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 160px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+/* ─── Waitlist input ─── */
+.waitlist-input {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  color: white;
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.waitlist-input::placeholder {
+  color: rgba(200, 200, 240, 0.35);
+}
+
+.waitlist-input:focus {
+  border-color: rgba(124, 111, 247, 0.5);
+  background: rgba(124, 111, 247, 0.06);
+  box-shadow: 0 0 0 3px rgba(124, 111, 247, 0.1);
+}
+
+/* ─── Feature pill ─── */
+.feature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 100px;
+  font-size: 0.78rem;
+  color: rgba(200, 200, 240, 0.6);
+  white-space: nowrap;
+}
+
+/* ─── Divider accent ─── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+  margin: 0;
+}
+
+/* ─── Footer ─── */
+.site-footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Score number count-up ─── */
+@keyframes count-up {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.score-number {
+  animation: count-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
+  display: inline-block;
+}
+
+/* ─── Status message ─── */
+@keyframes slide-in-status {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.status-msg {
+  animation: slide-in-status 0.3s ease-out forwards;
+}
+
+/* ─── Niche input appear ─── */
+@keyframes expand-in {
+  from { opacity: 0; transform: translateY(-8px) scaleY(0.9); }
+  to   { opacity: 1; transform: translateY(0) scaleY(1); }
+}
+
+.niche-expand {
+  animation: expand-in 0.2s ease-out forwards;
+  transform-origin: top;
+}
