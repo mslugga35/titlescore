@@ -136,20 +136,21 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       {/* Hero */}
-      <div className="max-w-3xl mx-auto px-4 pt-16 pb-8">
-        <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-zinc-400">
+      <div className="relative max-w-3xl mx-auto px-4 pt-20 pb-10">
+        <div className="hero-glow" />
+        <div className="text-center space-y-5 relative">
+          <div className="animate-fade-up inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 border border-zinc-800 text-sm text-zinc-400 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-amber-400" />
             AI-Powered CTR Prediction
           </div>
-          <h1 className="text-5xl font-bold tracking-tight">
+          <h1 className="animate-fade-up-delay-1 text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
             Score Your Title
             <br />
-            <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-violet-400 bg-clip-text text-transparent">
               Before You Upload
             </span>
           </h1>
-          <p className="text-lg text-zinc-400 max-w-xl mx-auto">
+          <p className="animate-fade-up-delay-2 text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed">
             Get an instant CTR prediction score for your YouTube title and
             thumbnail. Fix weak spots before they cost you views.
           </p>
