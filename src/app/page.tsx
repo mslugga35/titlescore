@@ -88,6 +88,8 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<number | null>(null);
   const [showNiche, setShowNiche] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -379,6 +381,42 @@ export default function Home() {
           </button>
         </div>
       )}
+
+      {/* Waitlist */}
+      <div className="max-w-md mx-auto px-4 pb-16">
+        <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-6 text-center space-y-3">
+          <h3 className="font-semibold text-zinc-200">Get notified of updates</h3>
+          <p className="text-sm text-zinc-500">YouTube API integration, bulk scoring, and more coming soon.</p>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={waitlistEmail}
+              onChange={(e) => setWaitlistEmail(e.target.value)}
+              placeholder="you@email.com"
+              className="flex-1 px-4 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+            />
+            <button
+              onClick={async () => {
+                if (!waitlistEmail.includes("@")) return;
+                const res = await fetch("/api/waitlist", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email: waitlistEmail }),
+                });
+                const data = await res.json();
+                setWaitlistStatus(data.message || data.error);
+                if (data.message) setWaitlistEmail("");
+              }}
+              className="px-4 py-2 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 rounded-xl text-sm font-medium whitespace-nowrap"
+            >
+              Notify Me
+            </button>
+          </div>
+          {waitlistStatus && (
+            <p className="text-sm text-emerald-400">{waitlistStatus}</p>
+          )}
+        </div>
+      </div>
 
       {/* Footer */}
       <footer className="border-t border-zinc-900 py-8 text-center text-sm text-zinc-600">
