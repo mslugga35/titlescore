@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     });
 
     const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+      response.content[0]?.type === "text" ? response.content[0].text : "";
 
     let score;
     try {
@@ -131,10 +131,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({
-      score,
-      tokens_used: response.usage.input_tokens + response.usage.output_tokens,
-    });
+    return NextResponse.json({ score });
   } catch (error) {
     console.error("Score API error:", error);
     return NextResponse.json(
