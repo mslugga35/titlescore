@@ -17,7 +17,7 @@ import {
 
 interface ScoreResult {
   total_score: number;
-  grade: string;
+  grade: "S" | "A" | "B" | "C" | "D" | "F";
   curiosity: { score: number; reason: string };
   emotion: { score: number; reason: string };
   clarity: { score: number; reason: string };
@@ -81,6 +81,7 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [niche, setNiche] = useState("");
   const [thumbnail, setThumbnail] = useState<string | null>(null);
+  const [thumbnailMediaType, setThumbnailMediaType] = useState<string>("image/png");
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScoreResult | null>(null);
@@ -92,11 +93,16 @@ export default function Home() {
   const handleThumbnail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Thumbnail must be under 5 MB");
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
       setThumbnailPreview(dataUrl);
       setThumbnail(dataUrl.split(",")[1]);
+      setThumbnailMediaType(file.type || "image/png");
     };
     reader.readAsDataURL(file);
   };
@@ -115,6 +121,7 @@ export default function Home() {
           title: title.trim(),
           niche: niche.trim() || undefined,
           thumbnail_base64: thumbnail || undefined,
+          thumbnail_media_type: thumbnail ? thumbnailMediaType : undefined,
         }),
       });
       const data = await res.json();
@@ -362,6 +369,7 @@ export default function Home() {
               setResult(null);
               setTitle("");
               setThumbnail(null);
+              setThumbnailMediaType("image/png");
               setThumbnailPreview(null);
             }}
             className="w-full py-3 px-6 bg-zinc-800 hover:bg-zinc-700 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"

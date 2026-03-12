@@ -3,6 +3,28 @@ import { NextRequest, NextResponse } from "next/server";
 
 const anthropic = new Anthropic();
 
+// Simple in-memory rate limiter: 10 requests per minute per IP
+const rateMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > RATE_LIMIT;
+}
+
+const MAX_TITLE_LENGTH = 200;
+const MAX_NICHE_LENGTH = 100;
+const MAX_THUMBNAIL_BYTES = 5 * 1024 * 1024; // 5 MB base64
+const ALLOWED_MEDIA_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"] as const;
+type MediaType = (typeof ALLOWED_MEDIA_TYPES)[number];
+
 const SCORING_PROMPT = `You are a YouTube CTR optimization expert. You've analyzed millions of YouTube videos and understand what makes titles and thumbnails get clicked.
 
 Analyze the following YouTube video title and provide a detailed CTR score and recommendations.
@@ -38,42 +60,56 @@ GRADING SCALE:
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, niche, thumbnail_base64 } = await req.json();
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Rate limit exceeded. Try again in a minute." },
+        { status: 429 }
+      );
+    }
+
+    const { title, niche, thumbnail_base64, thumbnail_media_type } = await req.json();
 
     if (!title || typeof title !== "string" || title.trim().length === 0) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
     }
+    if (title.length > MAX_TITLE_LENGTH) {
+      return NextResponse.json({ error: `Title must be under ${MAX_TITLE_LENGTH} characters` }, { status: 400 });
+    }
+    if (niche && (typeof niche !== "string" || niche.length > MAX_NICHE_LENGTH)) {
+      return NextResponse.json({ error: `Niche must be under ${MAX_NICHE_LENGTH} characters` }, { status: 400 });
+    }
 
-    const messages: Anthropic.MessageParam[] = [];
     const content: Anthropic.ContentBlockParam[] = [];
 
     if (thumbnail_base64) {
+      if (typeof thumbnail_base64 !== "string" || thumbnail_base64.length > MAX_THUMBNAIL_BYTES) {
+        return NextResponse.json({ error: "Thumbnail too large (max 5 MB)" }, { status: 400 });
+      }
+      const mediaType: MediaType = ALLOWED_MEDIA_TYPES.includes(thumbnail_media_type)
+        ? thumbnail_media_type
+        : "image/png";
+
       content.push({
         type: "image",
-        source: {
-          type: "base64",
-          media_type: "image/png",
-          data: thumbnail_base64,
-        },
+        source: { type: "base64", media_type: mediaType, data: thumbnail_base64 },
       });
       content.push({
         type: "text",
-        text: `Analyze this YouTube thumbnail together with the title below. Consider: face visibility, text readability, contrast, emotional expression, composition, mobile-friendliness.\n\nTitle: "${title}"${niche ? `\nNiche: ${niche}` : ""}`,
+        text: `Analyze this YouTube thumbnail together with the title below. Consider: face visibility, text readability, contrast, emotional expression, composition, mobile-friendliness.\n\nTitle: "${title.trim()}"${niche ? `\nNiche: ${niche.trim()}` : ""}`,
       });
     } else {
       content.push({
         type: "text",
-        text: `Title: "${title}"${niche ? `\nNiche: ${niche}` : ""}`,
+        text: `Title: "${title.trim()}"${niche ? `\nNiche: ${niche.trim()}` : ""}`,
       });
     }
-
-    messages.push({ role: "user", content });
 
     const response = await anthropic.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
       system: SCORING_PROMPT,
-      messages,
+      messages: [{ role: "user", content }],
     });
 
     const text =
@@ -87,6 +123,7 @@ export async function POST(req: NextRequest) {
       if (jsonMatch) {
         score = JSON.parse(jsonMatch[0]);
       } else {
+        console.error("Failed to parse score response:", text);
         return NextResponse.json(
           { error: "Failed to parse score" },
           { status: 500 }
