@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log(`[waitlist] ${sanitized}`);
+    console.log("[waitlist] new signup recorded");
     return NextResponse.json({ message: "You're on the list!" });
   } catch (error) {
     console.error("Waitlist error:", error);
