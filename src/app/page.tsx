@@ -206,13 +206,13 @@ export default function Home() {
     <div id="main-content" className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
       {/* ── Hero ── */}
-      <section className="relative max-w-3xl mx-auto px-5 pt-16 pb-8">
+      <section className="relative max-w-3xl mx-auto px-5 pt-10 sm:pt-16 pb-8">
         <div className="hero-glow" />
         <div className="relative text-center space-y-4">
 
           {/* Headline */}
           <div className="animate-fade-up space-y-2">
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.02]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.02]">
               Score Your Title
               <br />
               <span
@@ -414,7 +414,7 @@ export default function Home() {
 
           {/* Grade Card */}
           <div
-            className="result-card p-7"
+            className="result-card p-5 sm:p-7"
           >
             <div className="flex items-center justify-between gap-4">
               <div>
@@ -425,7 +425,7 @@ export default function Home() {
                   CTR Score
                 </p>
                 <div className="flex items-baseline gap-2">
-                  <span className="score-number text-7xl font-black tracking-tight leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>
+                  <span className="score-number text-6xl sm:text-7xl font-black tracking-tight leading-none" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {result.total_score}
                   </span>
                   <span className="text-2xl font-light" style={{ color: "rgba(200,200,240,0.2)" }}>
@@ -443,16 +443,16 @@ export default function Home() {
                 </p>
               </div>
               <div
-                className={`grade-badge w-20 h-20 rounded-2xl bg-gradient-to-br ${gradeColors[result.grade] ?? gradeColors.C} flex items-center justify-center shrink-0`}
+                className={`grade-badge w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${gradeColors[result.grade] ?? gradeColors.C} flex items-center justify-center shrink-0`}
                 style={{ boxShadow: `0 0 40px ${gradeGlow[result.grade] ?? "rgba(99,102,241,0.3)"}` }}
               >
-                <span className="text-4xl font-black text-white">{result.grade}</span>
+                <span className="text-3xl sm:text-4xl font-black text-white">{result.grade}</span>
               </div>
             </div>
           </div>
 
           {/* Breakdown */}
-          <div className="result-card p-7 space-y-5">
+          <div className="result-card p-5 sm:p-7 space-y-5">
             <h3
               className="text-xs font-semibold uppercase tracking-widest flex items-center gap-2"
               style={{ color: "rgba(200,200,240,0.35)" }}
@@ -500,7 +500,7 @@ export default function Home() {
           </div>
 
           {/* Improved Titles */}
-          <div className="result-card p-7 space-y-4">
+          <div className="result-card p-5 sm:p-7 space-y-4">
             <h3
               className="text-xs font-semibold uppercase tracking-widest flex items-center gap-2"
               style={{ color: "rgba(200,200,240,0.35)" }}
@@ -526,7 +526,7 @@ export default function Home() {
                     {t}
                   </span>
                   <div
-                    className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                    className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
                     style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
                     aria-hidden="true"
                   >
@@ -622,7 +622,7 @@ export default function Home() {
                 </p>
               </div>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <Mail
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
@@ -643,7 +643,7 @@ export default function Home() {
                 <button
                   onClick={handleWaitlist}
                   disabled={waitlistLoading || !waitlistEmail.includes("@")}
-                  className="btn-primary px-5 py-2.5 text-sm font-semibold text-white whitespace-nowrap shrink-0"
+                  className="btn-primary px-5 py-3 sm:py-2.5 text-sm font-semibold text-white whitespace-nowrap shrink-0"
                   aria-label={waitlistLoading ? "Submitting…" : "Notify me when new features launch"}
                 >
                   {waitlistLoading ? (
