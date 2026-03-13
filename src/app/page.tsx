@@ -14,9 +14,6 @@ import {
   Copy,
   Check,
   Mail,
-  Youtube,
-  TrendingUp,
-  Layers,
 } from "lucide-react";
 
 interface ScoreResult {
@@ -191,9 +188,15 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: waitlistEmail }),
       });
-      const data = await res.json();
-      setWaitlistStatus(data.message || data.error);
-      if (data.message) setWaitlistEmail("");
+      const data = await res.json() as { message?: string; error?: string };
+      if (res.ok && data.message) {
+        setWaitlistStatus(data.message);
+        setWaitlistEmail("");
+      } else {
+        setWaitlistStatus(data.error ?? "Something went wrong");
+      }
+    } catch {
+      setWaitlistStatus("Something went wrong");
     } finally {
       setWaitlistLoading(false);
     }
@@ -203,27 +206,12 @@ export default function Home() {
     <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
       {/* ── Hero ── */}
-      <section className="relative max-w-3xl mx-auto px-5 pt-24 pb-12">
+      <section className="relative max-w-3xl mx-auto px-5 pt-16 pb-8">
         <div className="hero-glow" />
-        <div className="relative text-center space-y-6">
-
-          {/* Badge */}
-          <div className="animate-fade-up">
-            <span
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide"
-              style={{
-                background: "rgba(79,142,247,0.08)",
-                border: "1px solid rgba(79,142,247,0.2)",
-                color: "rgba(160,180,255,0.8)",
-              }}
-            >
-              <Sparkles className="w-3.5 h-3.5" style={{ color: "#f59e0b" }} />
-              AI-Powered CTR Prediction
-            </span>
-          </div>
+        <div className="relative text-center space-y-4">
 
           {/* Headline */}
-          <div className="animate-fade-up-delay-1 space-y-2">
+          <div className="animate-fade-up space-y-2">
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.02]">
               Score Your Title
               <br />
@@ -240,32 +228,18 @@ export default function Home() {
 
           {/* Subtext */}
           <p
-            className="animate-fade-up-delay-2 text-lg max-w-lg mx-auto leading-relaxed"
+            className="animate-fade-up-delay-1 text-lg max-w-lg mx-auto leading-relaxed"
             style={{ color: "rgba(200,200,240,0.5)" }}
           >
             Get an instant CTR score for your YouTube title and thumbnail.
             Find weak spots before they cost you views.
           </p>
-
-          {/* Social proof strip */}
-          <div className="animate-fade-up-delay-3 flex items-center justify-center gap-6 flex-wrap">
-            {[
-              { icon: <Youtube className="w-3.5 h-3.5" />, label: "YouTube-native scoring" },
-              { icon: <BarChart3 className="w-3.5 h-3.5" />, label: "5 signal breakdown" },
-              { icon: <Zap className="w-3.5 h-3.5" />, label: "Instant results" },
-            ].map((f) => (
-              <span key={f.label} className="feature-pill">
-                {f.icon}
-                {f.label}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* ── Input ── */}
       <section className="max-w-2xl mx-auto px-4 pb-8">
-        <div className="input-card p-7 space-y-5">
+        <div className="input-card space-y-5">
 
           {/* Title Input */}
           <div className="space-y-2">
@@ -567,39 +541,8 @@ export default function Home() {
       <div className="section-divider mx-auto max-w-2xl my-2" />
 
       {/* ── Waitlist ── */}
-      <section className="waitlist-section py-20 px-4">
-        <div className="relative z-10 max-w-2xl mx-auto text-center space-y-8">
-
-          {/* Icon cluster */}
-          <div className="flex items-center justify-center gap-3">
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{
-                background: "rgba(124,111,247,0.12)",
-                border: "1px solid rgba(124,111,247,0.2)",
-              }}
-            >
-              <TrendingUp className="w-5 h-5" style={{ color: "#a78bfa" }} />
-            </div>
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{
-                background: "rgba(79,142,247,0.12)",
-                border: "1px solid rgba(79,142,247,0.2)",
-              }}
-            >
-              <Layers className="w-5 h-5" style={{ color: "#60a5fa" }} />
-            </div>
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center"
-              style={{
-                background: "rgba(124,111,247,0.12)",
-                border: "1px solid rgba(124,111,247,0.2)",
-              }}
-            >
-              <Youtube className="w-5 h-5" style={{ color: "#c084fc" }} />
-            </div>
-          </div>
+      <section className="waitlist-section py-14 px-4">
+        <div className="relative z-10 max-w-2xl mx-auto text-center space-y-6">
 
           {/* Headline */}
           <div className="space-y-3">
@@ -623,7 +566,7 @@ export default function Home() {
           </div>
 
           {/* Feature list */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-1.5">
             {[
               "YouTube API",
               "Bulk scoring",

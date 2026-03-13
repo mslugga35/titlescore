@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Rate limiter: 3 requests per minute per IP
+const RATE_LIMIT = 3;
+const RATE_WINDOW_MS = 60_000;
 const rateMap = new Map<string, { count: number; resetAt: number }>();
 
 function isRateLimited(ip: string): boolean {
@@ -15,8 +17,6 @@ function isRateLimited(ip: string): boolean {
   entry.count++;
   return entry.count > RATE_LIMIT;
 }
-const RATE_LIMIT = 3;
-const RATE_WINDOW_MS = 60_000;
 
 export async function POST(req: NextRequest) {
   try {

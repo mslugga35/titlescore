@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     const text =
       response.content[0]?.type === "text" ? response.content[0].text : "";
 
-    let score;
+    let score: unknown;
     try {
       score = JSON.parse(text);
     } catch {
