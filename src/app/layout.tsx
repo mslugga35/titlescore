@@ -66,10 +66,6 @@ export const metadata: Metadata = {
       "Score your YouTube title and thumbnail before you upload. Fix weak spots before they cost you views.",
   },
   robots: { index: true, follow: true },
-  icons: {
-    icon: "/favicon.ico",
-    apple: "/apple-touch-icon.svg",
-  },
   manifest: "/site.webmanifest",
 };
 
