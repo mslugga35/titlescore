@@ -205,6 +205,38 @@ export default function Home() {
   return (
     <div id="main-content" className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
+      {/* ── Top nav ── */}
+      <nav
+        className="border-b"
+        style={{ borderColor: "var(--border)", background: "var(--surface)" }}
+        aria-label="Site navigation"
+      >
+        <div className="max-w-3xl mx-auto px-5 py-3.5 flex items-center justify-between">
+          <span className="font-bold text-sm tracking-tight" style={{ color: "rgba(220,220,245,0.85)" }}>
+            TitleScore
+          </span>
+          <a
+            href="/blog"
+            className="text-xs font-medium px-3 py-1.5 rounded-full transition-colors"
+            style={{
+              color: "rgba(160,180,255,0.7)",
+              background: "rgba(124,111,247,0.08)",
+              border: "1px solid rgba(124,111,247,0.15)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(180,200,255,0.95)";
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(124,111,247,0.15)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(160,180,255,0.7)";
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(124,111,247,0.08)";
+            }}
+          >
+            Blog
+          </a>
+        </div>
+      </nav>
+
       {/* ── Hero ── */}
       <section className="relative max-w-3xl mx-auto px-5 pt-10 sm:pt-16 pb-8">
         <div className="hero-glow" />
@@ -683,6 +715,19 @@ export default function Home() {
             >
               &copy; {new Date().getFullYear()}
             </span>
+            <span
+              className="w-px h-3"
+              style={{ background: "rgba(255,255,255,0.08)" }}
+            />
+            <a
+              href="/blog"
+              className="text-xs transition-colors"
+              style={{ color: "rgba(180,180,220,0.3)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(160,180,255,0.7)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(180,180,220,0.3)")}
+            >
+              Blog
+            </a>
             <span
               className="w-px h-3"
               style={{ background: "rgba(255,255,255,0.08)" }}
