@@ -77,6 +77,7 @@ body {
 }
 
 /* ─── Score bar fill ─── */
+/* `to` is omitted intentionally — final width is set via inline style by React */
 @keyframes bar-fill {
   from { width: 0; }
 }

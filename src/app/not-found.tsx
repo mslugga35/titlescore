@@ -1,7 +1,8 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Zap } from "lucide-react";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Page Not Found — TitleScore",
   description: "This page doesn't exist. Head back to TitleScore to score your YouTube titles.",
 };
