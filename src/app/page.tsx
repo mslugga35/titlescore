@@ -203,7 +203,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+    <div id="main-content" className="min-h-screen" style={{ background: "var(--background)", color: "var(--foreground)" }}>
 
       {/* ── Hero ── */}
       <section className="relative max-w-3xl mx-auto px-5 pt-16 pb-8">
@@ -244,6 +244,7 @@ export default function Home() {
           {/* Title Input */}
           <div className="space-y-2">
             <label
+              htmlFor="video-title"
               className="text-xs font-semibold uppercase tracking-widest"
               style={{ color: "rgba(200,200,240,0.35)" }}
             >
@@ -251,6 +252,7 @@ export default function Home() {
             </label>
             <div className="relative">
               <input
+                id="video-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -258,10 +260,15 @@ export default function Home() {
                 placeholder="I Survived 100 Days in Minecraft Hardcore..."
                 className="ts-input pr-14"
                 maxLength={150}
+                aria-label="YouTube video title"
+                aria-describedby="title-count"
               />
               <span
+                id="title-count"
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 font-mono text-xs tabular-nums"
                 style={{ color: title.length > 120 ? "rgba(251,146,60,0.6)" : "rgba(180,180,220,0.22)" }}
+                aria-live="polite"
+                aria-label={`${title.length} of 150 characters`}
               >
                 {title.length}/150
               </span>
@@ -275,21 +282,25 @@ export default function Home() {
             style={{ color: "rgba(180,180,240,0.4)" }}
             onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(200,200,255,0.65)")}
             onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(180,180,240,0.4)")}
+            aria-expanded={showNiche}
+            aria-controls="niche-input"
           >
             <ChevronDown
               className={`w-3.5 h-3.5 transition-transform duration-200 ${showNiche ? "rotate-180" : ""}`}
+              aria-hidden="true"
             />
             Add niche context (optional)
           </button>
 
           {showNiche && (
-            <div className="niche-expand">
+            <div id="niche-input" className="niche-expand">
               <input
                 type="text"
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
                 placeholder="e.g., Gaming, Finance, Cooking, Tech Reviews"
                 className="ts-input text-sm"
+                aria-label="Video niche or category (optional)"
               />
             </div>
           )}
@@ -297,6 +308,7 @@ export default function Home() {
           {/* Thumbnail Upload */}
           <div className="space-y-2">
             <label
+              htmlFor="thumbnail-upload"
               className="text-xs font-semibold uppercase tracking-widest"
               style={{ color: "rgba(200,200,240,0.35)" }}
             >
@@ -311,12 +323,16 @@ export default function Home() {
             <div
               onClick={() => fileRef.current?.click()}
               className="thumb-dropzone p-4 text-center"
+              role="button"
+              tabIndex={0}
+              aria-label={thumbnailPreview ? "Replace thumbnail image" : "Upload thumbnail image"}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && fileRef.current?.click()}
             >
               {thumbnailPreview ? (
                 <div className="space-y-2">
                   <img
                     src={thumbnailPreview}
-                    alt="Thumbnail preview"
+                    alt="Uploaded thumbnail preview"
                     className="max-h-40 mx-auto rounded-lg"
                     style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}
                   />
@@ -330,7 +346,7 @@ export default function Home() {
                     className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto"
                     style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
                   >
-                    <Upload className="w-4 h-4" style={{ color: "rgba(180,180,240,0.35)" }} />
+                    <Upload className="w-4 h-4" aria-hidden="true" style={{ color: "rgba(180,180,240,0.35)" }} />
                   </div>
                   <p className="text-sm" style={{ color: "rgba(180,180,220,0.35)" }}>
                     Drop thumbnail here or{" "}
@@ -341,11 +357,13 @@ export default function Home() {
               )}
             </div>
             <input
+              id="thumbnail-upload"
               ref={fileRef}
               type="file"
               accept="image/*"
               onChange={handleThumbnail}
               className="hidden"
+              aria-label="Upload thumbnail image"
             />
           </div>
 
@@ -354,18 +372,20 @@ export default function Home() {
             onClick={handleScore}
             disabled={loading || !title.trim()}
             className="btn-primary w-full py-3.5 px-6 text-base flex items-center justify-center gap-2.5 text-white"
+            aria-label={loading ? "Analyzing your title…" : "Score my title"}
           >
             {loading ? (
               <>
                 <div
                   className="w-4 h-4 rounded-full border-2 border-t-white animate-spin"
                   style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "white" }}
+                  aria-hidden="true"
                 />
                 <span>Analyzing...</span>
               </>
             ) : (
               <>
-                <Zap className="w-4 h-4" />
+                <Zap className="w-4 h-4" aria-hidden="true" />
                 <span>Score My Title</span>
               </>
             )}
@@ -494,6 +514,10 @@ export default function Home() {
                   key={i}
                   className="title-row flex items-center justify-between px-4 py-3 group cursor-pointer"
                   onClick={() => copyTitle(t, i)}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Copy title: ${t}`}
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && copyTitle(t, i)}
                 >
                   <span
                     className="text-sm leading-snug flex-1 pr-3"
@@ -504,6 +528,7 @@ export default function Home() {
                   <div
                     className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
                     style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)" }}
+                    aria-hidden="true"
                   >
                     {copied === i ? (
                       <Check className="w-3.5 h-3.5" style={{ color: "#34d399" }} />
@@ -602,6 +627,7 @@ export default function Home() {
                   <Mail
                     className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
                     style={{ color: "rgba(180,180,240,0.3)" }}
+                    aria-hidden="true"
                   />
                   <input
                     type="email"
@@ -610,17 +636,21 @@ export default function Home() {
                     onKeyDown={(e) => e.key === "Enter" && handleWaitlist()}
                     placeholder="you@email.com"
                     className="waitlist-input pl-10"
+                    aria-label="Email address for waitlist"
+                    autoComplete="email"
                   />
                 </div>
                 <button
                   onClick={handleWaitlist}
                   disabled={waitlistLoading || !waitlistEmail.includes("@")}
                   className="btn-primary px-5 py-2.5 text-sm font-semibold text-white whitespace-nowrap shrink-0"
+                  aria-label={waitlistLoading ? "Submitting…" : "Notify me when new features launch"}
                 >
                   {waitlistLoading ? (
                     <div
                       className="w-4 h-4 rounded-full border-2 animate-spin mx-auto"
                       style={{ borderColor: "rgba(255,255,255,0.2)", borderTopColor: "white" }}
+                      aria-hidden="true"
                     />
                   ) : (
                     "Notify me"

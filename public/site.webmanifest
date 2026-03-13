@@ -1,0 +1,29 @@
+{
+  "name": "TitleScore",
+  "short_name": "TitleScore",
+  "description": "AI-powered YouTube CTR prediction. Score your title before you upload.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06060d",
+  "theme_color": "#7c6ff7",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ]
+}

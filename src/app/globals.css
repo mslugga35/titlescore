@@ -334,6 +334,16 @@ body {
   animation: slide-in-status 0.3s ease-out forwards;
 }
 
+/* ─── 404 page link ─── */
+.not-found-link {
+  color: rgba(160, 180, 255, 0.4);
+  transition: color 0.2s;
+}
+
+.not-found-link:hover {
+  color: rgba(160, 180, 255, 0.7);
+}
+
 /* ─── Niche input appear ─── */
 @keyframes expand-in {
   from { opacity: 0; transform: translateY(-8px) scaleY(0.9); }
