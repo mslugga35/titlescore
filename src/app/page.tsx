@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import Link from "next/link";
 import {
   Zap,
   Upload,
@@ -15,6 +16,7 @@ import {
   Check,
   Mail,
 } from "lucide-react";
+import { blogPosts } from "@/lib/blog-data";
 
 interface ScoreResult {
   total_score: number;
@@ -596,6 +598,81 @@ export default function Home() {
 
       {/* ── Divider ── */}
       <div className="section-divider mx-auto max-w-2xl my-2" />
+
+      {/* ── Blog Preview ── */}
+      <section className="max-w-2xl mx-auto px-4 py-12">
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <p
+              className="text-xs font-semibold uppercase tracking-widest"
+              style={{ color: "rgba(124,111,247,0.8)" }}
+            >
+              Latest from the blog
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Learn how creators write titles that convert
+            </h2>
+          </div>
+
+          {blogPosts.length > 0 && (
+            <Link
+              href={`/blog/${blogPosts[0].slug}`}
+              className="block result-card p-5 sm:p-7 hover:opacity-80 transition-opacity group"
+              style={{ textDecoration: "none" }}
+            >
+              <div className="space-y-4">
+                <div>
+                  <h3
+                    className="text-lg font-bold leading-snug tracking-tight mb-2"
+                    style={{ color: "rgba(235,235,255,0.92)" }}
+                  >
+                    {blogPosts[0].title}
+                  </h3>
+                  <p className="text-sm leading-relaxed" style={{ color: "rgba(180,180,220,0.55)" }}>
+                    {blogPosts[0].description}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <span
+                    className="text-xs font-medium flex items-center gap-1"
+                    style={{ color: "rgba(160,180,255,0.8)" }}
+                  >
+                    Read article
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                  <span
+                    className="text-xs"
+                    style={{ color: "rgba(180,180,220,0.3)" }}
+                  >
+                    {blogPosts[0].readTime}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          )}
+
+          <Link
+            href="/blog"
+            className="text-sm font-medium px-4 py-2 rounded-lg inline-block transition-colors"
+            style={{
+              color: "rgba(160,180,255,0.8)",
+              background: "rgba(124,111,247,0.08)",
+              border: "1px solid rgba(124,111,247,0.15)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(124,111,247,0.15)";
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(180,200,255,0.95)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.background = "rgba(124,111,247,0.08)";
+              (e.currentTarget as HTMLAnchorElement).style.color = "rgba(160,180,255,0.8)";
+            }}
+          >
+            View all articles →
+          </Link>
+        </div>
+      </section>
 
       {/* ── Waitlist ── */}
       <section className="waitlist-section py-14 px-4">
