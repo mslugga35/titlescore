@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { blogPosts } from "@/lib/blog-data";
 
 export const metadata: Metadata = {
   title: "Blog — YouTube Title Tips & CTR Strategies | TitleScore",
@@ -26,18 +27,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-const posts = [
-  {
-    slug: "youtube-title-tips",
-    title: "7 YouTube Title Formulas That Actually Get Clicks (2026)",
-    description:
-      "The specific patterns top creators use to write titles that generate curiosity, trigger emotion, and convert browsers into viewers — with real examples and a scoring framework.",
-    date: "March 13, 2026",
-    readTime: "8 min read",
-    tags: ["CTR", "Title Formulas", "YouTube Growth"],
-    gradient: "from-blue-500 to-indigo-600",
-  },
-];
+const posts = blogPosts;
 
 export default function BlogIndex() {
   return (
