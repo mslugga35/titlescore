@@ -8,15 +8,28 @@ const rateMap = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT = 10;
 const RATE_WINDOW_MS = 60_000;
 
-function isRateLimited(ip: string): boolean {
+function getRateLimitInfo(ip: string): {
+  isLimited: boolean;
+  limit: number;
+  remaining: number;
+  resetAt: number;
+} {
   const now = Date.now();
   const entry = rateMap.get(ip);
   if (!entry || now > entry.resetAt) {
     rateMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
-    return false;
+    return { isLimited: false, limit: RATE_LIMIT, remaining: RATE_LIMIT - 1, resetAt: now + RATE_WINDOW_MS };
   }
   entry.count++;
-  return entry.count > RATE_LIMIT;
+  const remaining = Math.max(0, RATE_LIMIT - entry.count);
+  return { isLimited: entry.count > RATE_LIMIT, limit: RATE_LIMIT, remaining, resetAt: entry.resetAt };
+}
+
+function addRateLimitHeaders(response: NextResponse, rateLimitInfo: ReturnType<typeof getRateLimitInfo>) {
+  response.headers.set("RateLimit-Limit", rateLimitInfo.limit.toString());
+  response.headers.set("RateLimit-Remaining", rateLimitInfo.remaining.toString());
+  response.headers.set("RateLimit-Reset", Math.ceil(rateLimitInfo.resetAt / 1000).toString());
+  return response;
 }
 
 const MAX_TITLE_LENGTH = 200;
@@ -61,30 +74,36 @@ GRADING SCALE:
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
+    const rateLimitInfo = getRateLimitInfo(ip);
+    if (rateLimitInfo.isLimited) {
+      const response = NextResponse.json(
         { error: "Rate limit exceeded. Try again in a minute." },
         { status: 429 }
       );
+      return addRateLimitHeaders(response, rateLimitInfo);
     }
 
     const { title, niche, thumbnail_base64, thumbnail_media_type } = await req.json();
 
     if (!title || typeof title !== "string" || title.trim().length === 0) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+      const response = NextResponse.json({ error: "Title is required" }, { status: 400 });
+      return addRateLimitHeaders(response, rateLimitInfo);
     }
     if (title.length > MAX_TITLE_LENGTH) {
-      return NextResponse.json({ error: `Title must be under ${MAX_TITLE_LENGTH} characters` }, { status: 400 });
+      const response = NextResponse.json({ error: `Title must be under ${MAX_TITLE_LENGTH} characters` }, { status: 400 });
+      return addRateLimitHeaders(response, rateLimitInfo);
     }
     if (niche && (typeof niche !== "string" || niche.length > MAX_NICHE_LENGTH)) {
-      return NextResponse.json({ error: `Niche must be under ${MAX_NICHE_LENGTH} characters` }, { status: 400 });
+      const response = NextResponse.json({ error: `Niche must be under ${MAX_NICHE_LENGTH} characters` }, { status: 400 });
+      return addRateLimitHeaders(response, rateLimitInfo);
     }
 
     const content: Anthropic.ContentBlockParam[] = [];
 
     if (thumbnail_base64) {
       if (typeof thumbnail_base64 !== "string" || thumbnail_base64.length > MAX_THUMBNAIL_BYTES) {
-        return NextResponse.json({ error: "Thumbnail too large (max 5 MB)" }, { status: 400 });
+        const response = NextResponse.json({ error: "Thumbnail too large (max 5 MB)" }, { status: 400 });
+        return addRateLimitHeaders(response, rateLimitInfo);
       }
       const mediaType: MediaType = ALLOWED_MEDIA_TYPES.includes(thumbnail_media_type)
         ? thumbnail_media_type
@@ -124,19 +143,24 @@ export async function POST(req: NextRequest) {
         score = JSON.parse(jsonMatch[0]);
       } else {
         console.error("Failed to parse score response:", text);
-        return NextResponse.json(
+        const response = NextResponse.json(
           { error: "Failed to parse score" },
           { status: 500 }
         );
+        return addRateLimitHeaders(response, rateLimitInfo);
       }
     }
 
-    return NextResponse.json({ score });
+    const response = NextResponse.json({ score });
+    return addRateLimitHeaders(response, rateLimitInfo);
   } catch (error) {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+    const rateLimitInfo = getRateLimitInfo(ip);
     console.error("Score API error:", error);
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: "Failed to generate score" },
       { status: 500 }
     );
+    return addRateLimitHeaders(response, rateLimitInfo);
   }
 }
