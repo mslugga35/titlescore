@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Scratch from the Next.js API routes -> CF Pages Functions migration
+.api-backup/
+.functions-trash/
+.next.stale/

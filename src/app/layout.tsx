@@ -82,6 +82,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* WebMCP - exposes the title scorer to an agent in the visitor's browser.
+            Inert until this origin serves a valid origin-trial token. */}
+        <script src="/webmcp.js" defer></script>
       </head>
       <body
         className={`${dmSans.variable} ${jetbrainsMono.variable} antialiased`}
