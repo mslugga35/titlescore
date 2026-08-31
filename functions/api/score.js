@@ -149,8 +149,13 @@ export async function onRequestPost(context) {
       // Say so distinctly - this exact failure returned a generic 500 for four
       // months and nobody could tell it from a bad request or a dead key.
       if (/credit balance is too low/i.test(upstreamMessage)) {
+        // Deliberately not "try again later" - the Anthropic account has no
+        // credit balance and funding it is a business decision that has been
+        // made against for now (2026-08-28). Telling visitors to retry shortly
+        // would be a lie, and they would keep retrying against a dead endpoint.
+        // Point them at the waitlist that already exists on the page instead.
         return Response.json({
-          error: "Scoring is temporarily unavailable. Please try again later.",
+          error: "Title scoring is offline right now. Join the waitlist below and we'll email you when it's back.",
           reason: "upstream_account_credit",
         }, { status: 503 });
       }
